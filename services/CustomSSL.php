@@ -19,27 +19,27 @@ class CustomSSL extends CFServiceBase
      */
     public function getCurrentCustomCertID($zoneID)
     {
-	    $url = "zones/$zoneID/custom_certificates?status=active";
-	    try {
-		    $res = $this->client->request('GET', $url);
+        $url = "zones/$zoneID/custom_certificates?status=active";
+        try {
+            $res = $this->client->request('GET', $url);
             $data = json_decode($res->getBody()->getContents(), true);
             if ($data["success"]) {
-        	    if (empty($data["result"])) {
-        		    return null; // No existing certs found
-        	    } else if (count($data["result"]) > 1) {
-        		    print "There are more than one custom certificate installed for the given zone\n";
-        		    return false; // Do not expect to see more than one custom certificate there, stop and manually verify on Cloudflare
-        	    }
-        	    return $data["result"][0]["id"]; // The Id of the current certificate
+                if (empty($data["result"])) {
+                    return null; // No existing certs found
+                } elseif (count($data["result"]) > 1) {
+                    print "There are more than one custom certificate installed for the given zone\n";
+                    return false; // Do not expect to see more than one custom certificate there, stop and manually verify on Cloudflare
+                }
+                return $data["result"][0]["id"]; // The Id of the current certificate
             } else {
-        	    print "Cannot check the current SSL configuration for the given zone due to unknown reason from Cloudflare\n";
+                print "Cannot check the current SSL configuration for the given zone due to unknown reason from Cloudflare\n";
                 return false;
             }
-	    } catch (Exception $e) {
-		    print "Failed to make request to the Cloudflare\n";
-		    print "************\nError: {$e->getMessage()}************\n";
-		    return false;
-	    }	
+        } catch (Exception $e) {
+            print "Failed to make request to the Cloudflare\n";
+            print "************\nError: {$e->getMessage()}************\n";
+            return false;
+        }
     }
 
     /**
@@ -52,7 +52,7 @@ class CustomSSL extends CFServiceBase
      */
     public function uploadNewCustomCert($zoneID, $cert, $key)
     {
-	    $url = "zones/$zoneID/custom_certificates";
+        $url = "zones/$zoneID/custom_certificates";
         $uploadData = [
             "certificate" => $cert,
             "private_key" => $key,
@@ -60,16 +60,16 @@ class CustomSSL extends CFServiceBase
         ];
         $options = [
             'body' => json_encode($uploadData, JSON_UNESCAPED_SLASHES)
-        ]; 
-	    try {
-		    $res = $this->client->request('POST', $url, $options);
+        ];
+        try {
+            $res = $this->client->request('POST', $url, $options);
             $data = json_decode($res->getBody()->getContents(), true);
             return $data["success"];
-	    } catch (Exception $e) {
-		    print "Failed to make request to the Cloudflare\n";
-		    print "************\nError: {$e->getMessage()}************\n";
-		    return false;
-	    }	
+        } catch (Exception $e) {
+            print "Failed to make request to the Cloudflare\n";
+            print "************\nError: {$e->getMessage()}************\n";
+            return false;
+        }
     }
 
     /**
@@ -81,16 +81,16 @@ class CustomSSL extends CFServiceBase
      */
     public function removeCurrentCert($zoneID, $certID)
     {
-	    $url = "zones/$zoneID/custom_certificates/$certID";
-	    try {
-		    $res = $this->client->request("DELETE", $url);
+        $url = "zones/$zoneID/custom_certificates/$certID";
+        try {
+            $res = $this->client->request("DELETE", $url);
             $data = json_decode($res->getBody()->getContents(), true);
             return $data['success'];
-	    } catch (Exception $e) {
-		    print "Failed to make request to the Cloudflare\n";
-		    print "************\nError: {$e->getMessage()}************\n";
-		    return false;
-	    }
+        } catch (Exception $e) {
+            print "Failed to make request to the Cloudflare\n";
+            print "************\nError: {$e->getMessage()}************\n";
+            return false;
+        }
     }
     
     /**
@@ -124,6 +124,6 @@ class CustomSSL extends CFServiceBase
             print "Failed to make request to the Cloudflare\n";
             print "************\nError: {$e->getMessage()}************\n";
             return false;
-        }   
+        }
     }
 }
