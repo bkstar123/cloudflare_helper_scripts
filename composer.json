@@ -1,0 +1,16 @@
+{
+    "name": "tuanha/sslhelpers",
+    "description": "SSL tools",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "spatie/ssl-certificate": "^1.15",
+        "guzzlehttp/guzzle": "^6.3",
+        "symfony/dotenv": "^4.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "CFBuddy\\": "services/"
+        }
+    }
+}
