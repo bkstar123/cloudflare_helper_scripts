@@ -4,13 +4,13 @@
  *
  * @author: tuanha
  */
-require(__DIR__.'/bootstrap.php');
+require(__DIR__.'/../bootstrap.php');
 
-$list = file_get_contents(__DIR__ . '/input/' . $_ENV['CFCHECK_ZONE']);
+$list = file_get_contents(__DIR__ . '/../input/' . $_ENV['CFCHECK_ZONE']);
 $zones = explode(',', $list);
 
 // Open file for writing the output in csv format, insert the field headers
-$fh = fopen(__DIR__ . '/output/' . $_ENV['CFCHECK_RESULT'], 'w');
+$fh = fopen(__DIR__ . '/../output/' . $_ENV['CFCHECK_RESULT'], 'w');
 fputcsv($fh, ['URL', 'Issuer', 'Expired_at', 'Hosts']);
 
 $customSSL = new CFBuddy\CustomSSL();

@@ -4,11 +4,11 @@
  *
  * @author: tuanha
  */
-require(__DIR__.'/bootstrap.php');
+require(__DIR__.'/../bootstrap.php');
 
-$list = file_get_contents(__DIR__ . '/input/' . $_ENV['CHECKSSL_DOMAIN']);
+$list = file_get_contents(__DIR__ . '/../input/' . $_ENV['CHECKSSL_DOMAIN']);
 $domains = explode(',', $list);
-$fh = fopen(__DIR__ . '/output/' . $_ENV['CHECKSSL_RESULT'], 'w');
+$fh = fopen(__DIR__ . '/../output/' . $_ENV['CHECKSSL_RESULT'], 'w');
 fputcsv($fh, ['URL', 'Issuer', 'Valid_from', 'Expired_at', 'CN', 'Fingerprint', 'Remaining_days', 'Point_to_IP', 'Alias_to', 'SAN']);
 foreach ($domains as $index => $domain) {
     $domain = trim($domain);

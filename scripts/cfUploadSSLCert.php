@@ -4,11 +4,11 @@
  *
  * @author: tuanha
  */
-require(__DIR__.'/bootstrap.php');
+require(__DIR__.'/../bootstrap.php');
 
-$cert = file_get_contents(__DIR__ . '/input/' . $_ENV['CFUPLOAD_CERT']);
-$key = file_get_contents(__DIR__.'/input/' . $_ENV['CFUPLOAD_KEY']);
-$list = file_get_contents(__DIR__.'/input/' . $_ENV['CFUPLOAD_ZONE']);
+$cert = file_get_contents(__DIR__ . '/../input/' . $_ENV['CFUPLOAD_CERT']);
+$key = file_get_contents(__DIR__.'/../input/' . $_ENV['CFUPLOAD_KEY']);
+$list = file_get_contents(__DIR__.'/../input/' . $_ENV['CFUPLOAD_ZONE']);
 $zones = explode(',', $list);
 
 $customSSL = new CFBuddy\CustomSSL();

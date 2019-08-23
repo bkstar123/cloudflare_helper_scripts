@@ -4,8 +4,9 @@
  *
  * @author: tuanha
  */
-$certificate = file_get_contents(__DIR__ . '/input/' . $_ENV['CHECKSSL_CERTFILE']);
+require(__DIR__.'/../bootstrap.php');
 
+$certificate = file_get_contents(__DIR__ . '/../input/' . $_ENV['CHECKSSL_CERTFILE']);
 $ssl = openssl_x509_parse($certificate);
 
 $validFrom = $ssl['validFrom_time_t'];
