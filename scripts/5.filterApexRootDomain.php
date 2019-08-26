@@ -10,7 +10,7 @@ require(__DIR__.'/../bootstrap.php');
  * Fetch the TLD data
  * source: https://publicsuffix.org/list/public_suffix_list.dat
  */
-$TLDs = file_get_contents(__DIR__ . '/../input/tlds.txt');
+$TLDs = file_get_contents(__DIR__ . '/../input/5.tlds.txt');
 $TLDs = explode(',', $TLDs);
 
 // Fetch the list of domains to proceed
@@ -34,6 +34,9 @@ foreach ($domains as $index => $domain) {
     }
 
     $apexZones[] = $apexZone;
+
+    // Update progress
+    print ceil(($index + 1)/count($domains)*100) . "% - Completed $domain\n";
 }
 fputs($fh, implode(',', array_unique($apexZones)));
 fclose($fh);
