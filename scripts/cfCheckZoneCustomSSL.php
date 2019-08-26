@@ -11,7 +11,7 @@ $zones = explode(',', $list);
 
 // Open file for writing the output in csv format, insert the field headers
 $fh = fopen(__DIR__ . '/../output/' . $_ENV['CFCHECK_RESULT'], 'w');
-fputcsv($fh, ['URL', 'Issuer', 'Expired_at', 'Hosts']);
+fputcsv($fh, ['URL', 'Found on Cloudflare', 'Issuer', 'Expired_at', 'Hosts']);
 
 $customSSL = new CFBuddy\CustomSSL();
 $zoneMgmt = new CFBuddy\ZoneMgmt();
@@ -23,8 +23,9 @@ foreach ($zones as $index => $zone) {
     // Check zoneID
     $zoneID = $zoneMgmt->getZoneID($zone);
     if ($zoneID === null || $zoneID === false) {
-        print "Failed to check the zone $zone details. Please manually verify on Cloudflare\n";
-        break;
+        print "Failed to check the zone $zone details, skip it for now. Please manually verify on Cloudflare\n";
+        fputcsv($fh, [$zone, 'false', '', '', '']);
+        continue;
     }
 
     /*
@@ -38,7 +39,7 @@ foreach ($zones as $index => $zone) {
         break;
     } elseif ($currentCertID === null) {
         print "No current certificate found for the zone $zone\n";
-        fputcsv($fh, [$zone, '', '', '']);
+        fputcsv($fh, [$zone, 'true', '', '', '']);
     } else {
         print "A custom certificate found. Fetching its data...\n";
         if (!$customSSL->fetchCertData($zone, $zoneID, $currentCertID, $fh)) {

@@ -111,6 +111,7 @@ class CustomSSL extends CFServiceBase
             if ($data["success"]) {
                 fputcsv($fh, [
                     $zone,
+                    'true',
                     $data['result']['issuer'],
                     $data['result']['expires_on'],
                     json_encode($data['result']['hosts'])
