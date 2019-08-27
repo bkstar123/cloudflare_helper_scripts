@@ -1,6 +1,6 @@
 <?php
 /**
- * Fetch the custom SSL configuration for Cloudflare zones
+ * Extract apex/root domains from a given list of hostnames
  *
  * @author: tuanha
  */
