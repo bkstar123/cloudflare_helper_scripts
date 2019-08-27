@@ -113,6 +113,8 @@ class CustomSSL extends CFServiceBase
                     $zone,
                     'true',
                     $data['result']['issuer'],
+                    $data['result']['uploaded_on'],
+                    $data['result']['modified_on'],
                     $data['result']['expires_on'],
                     json_encode($data['result']['hosts'])
                 ]);
