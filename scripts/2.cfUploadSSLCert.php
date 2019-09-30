@@ -13,6 +13,7 @@ $zones = explode(',', $list);
 
 $customSSL = new CFBuddy\CustomSSL();
 $zoneMgmt = new CFBuddy\ZoneMgmt();
+$skippedZones = [];
 
 foreach ($zones as $index => $zone) {
     $zone = trim($zone);
@@ -21,8 +22,9 @@ foreach ($zones as $index => $zone) {
     // Check zoneID
     $zoneID = $zoneMgmt->getZoneID($zone);
     if ($zoneID === null || $zoneID === false) {
-        print "Failed to check the zone $zone details. Please manually verify on Cloudflare\n";
-        break;
+        print "Failed to check the zone $zone details, skip it for now. Please manually verify on Cloudflare\n";
+        array_push($skippedZones, $zone);
+        continue;
     }
 
     /*
@@ -56,3 +58,5 @@ foreach ($zones as $index => $zone) {
     // Update progress
     print ceil(($index + 1)/count($zones)*100) . "% - Completed $zone\n";
 }
+print "The following zones were skipped, please manually verify their existence on Cloudflare\n";
+print json_encode($skippedZones) . "\n";
