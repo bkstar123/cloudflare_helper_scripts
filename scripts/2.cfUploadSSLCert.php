@@ -58,5 +58,8 @@ foreach ($zones as $index => $zone) {
     // Update progress
     print ceil(($index + 1)/count($zones)*100) . "% - Completed $zone\n";
 }
-print "The following zones were skipped, please manually verify their existence on Cloudflare\n";
-print json_encode($skippedZones) . "\n";
+
+if (!empty($skippedZones)) {
+    print "The following zones were skipped, please manually verify their existence on Cloudflare\n";
+    print json_encode($skippedZones) . "\n";
+}
