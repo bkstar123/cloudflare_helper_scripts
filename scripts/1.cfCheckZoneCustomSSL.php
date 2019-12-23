@@ -17,7 +17,7 @@ $customSSL = new CFBuddy\CustomSSL();
 $zoneMgmt = new CFBuddy\ZoneMgmt();
 
 foreach ($zones as $index => $zone) {
-    $zone = trim($zone);
+    $zone = idn_to_ascii(trim($zone));
     print "........................$index. Processing the zone $zone......................\n";
 
     // Check zoneID

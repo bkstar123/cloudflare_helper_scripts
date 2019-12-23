@@ -11,7 +11,7 @@ $domains = explode(',', $list);
 $fh = fopen(__DIR__ . '/../output/' . $_ENV['CHECKSSL_RESULT'], 'w');
 fputcsv($fh, ['URL', 'Issuer', 'Valid_from', 'Expired_at', 'CN', 'Fingerprint', 'Remaining_days', 'Point_to_IP', 'Alias_to', 'SAN']);
 foreach ($domains as $index => $domain) {
-    $domain = trim($domain);
+    $domain = idn_to_ascii(trim($domain));
     $a_records = dns_get_record($domain, DNS_A);
     $cname_records = dns_get_record($domain, DNS_CNAME);
     $IPs = [];
