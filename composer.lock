@@ -398,16 +398,16 @@
         },
         {
             "name": "spatie/ssl-certificate",
-            "version": "1.15.0",
+            "version": "1.19.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ssl-certificate.git",
-                "reference": "3415761f8baba48050faf7bb79bfea8f16a9b771"
+                "reference": "0fba58aa801dc85fcc009dc1e8d1e71b97a6b250"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ssl-certificate/zipball/3415761f8baba48050faf7bb79bfea8f16a9b771",
-                "reference": "3415761f8baba48050faf7bb79bfea8f16a9b771",
+                "url": "https://api.github.com/repos/spatie/ssl-certificate/zipball/0fba58aa801dc85fcc009dc1e8d1e71b97a6b250",
+                "reference": "0fba58aa801dc85fcc009dc1e8d1e71b97a6b250",
                 "shasum": ""
             },
             "require": {
@@ -437,9 +437,9 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
-                    "role": "Developer",
                     "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be"
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
                 }
             ],
             "description": "A class to easily query the properties of an ssl certificate",
@@ -448,7 +448,7 @@
                 "spatie",
                 "ssl-certificate"
             ],
-            "time": "2019-07-22T20:45:19+00:00"
+            "time": "2020-04-01T14:52:44+00:00"
         },
         {
             "name": "symfony/dotenv",

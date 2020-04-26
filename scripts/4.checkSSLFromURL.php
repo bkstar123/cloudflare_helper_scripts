@@ -11,11 +11,19 @@ $domains = explode(',', $list);
 $fh = fopen(__DIR__ . '/../output/' . $_ENV['CHECKSSL_RESULT'], 'w');
 fputcsv($fh, ['URL', 'Issuer', 'Valid_from', 'Expired_at', 'CN', 'Fingerprint', 'Remaining_days', 'Point_to_IP', 'Alias_to', 'SAN']);
 foreach ($domains as $index => $domain) {
-    $domain = idn_to_ascii(trim($domain));
-    $a_records = dns_get_record($domain, DNS_A);
-    $cname_records = dns_get_record($domain, DNS_CNAME);
+    $domain = idn_to_ascii(trim($domain), IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
     $IPs = [];
     $Aliases = [];
+    try {
+        $a_records = dns_get_record($domain, DNS_A);
+    } catch (Exception $e) {
+        $a_records = [];
+    }
+    try {
+        $cname_records = dns_get_record($domain, DNS_CNAME);
+    } catch (Exception $e) {
+        $cname_records = [];
+    }
     if (!empty($a_records)) {
         foreach ($a_records as $record) {
             array_push($IPs, $record['ip']);

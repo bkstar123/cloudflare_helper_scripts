@@ -6,16 +6,21 @@
  */
 require(__DIR__.'/../bootstrap.php');
 
+use Spatie\SslCertificate\SslCertificate;
+
 $certificate = file_get_contents(__DIR__ . '/../input/' . $_ENV['CHECKSSL_CERTFILE']);
-$ssl = openssl_x509_parse($certificate);
-
-$validFrom = $ssl['validFrom_time_t'];
-$validTo = $ssl['validTo_time_t'];
-
-print "-------------Certificate data-----------------\n\n";
-print "Common Name: " . $ssl['subject']['CN'] . "\n";
-print "Valid from: " . (new DateTime("@$validFrom"))->format('Y-m-d H:i:s') . "\n";
-print "Valid until: " . (new DateTime("@$validTo"))->format('Y-m-d H:i:s') . "\n";
-print "Issuer: " . $ssl['issuer']['CN'] . "\n";
-print "SAN: " . $ssl['extensions']['subjectAltName'] . "\n";
-print "-----------------End-------------------------------\n";
+$ssl = SslCertificate::createFromString($certificate);
+$msgFormat = "CN: %s,\nOrganization: %s,\nOrganization Unit: %s,\nLocality: %s,\nState: %s,\nCountry: %s,\nValid from: %s,\nValid until: %s,\nIssuer: %s,\nSAN: %s\n";
+    $msg = sprintf($msgFormat, 
+        $ssl->getDomain(), 
+        $ssl->getOrganization(),
+        $ssl->getRawCertificateFields()['subject']['OU'] ?? '',
+        $ssl->getRawCertificateFields()['subject']['L'] ?? '',
+        $ssl->getRawCertificateFields()['subject']['ST'] ?? '',
+        $ssl->getRawCertificateFields()['subject']['C'] ?? '',
+        $ssl->validFromDate(),
+        $ssl->expirationDate(),
+        $ssl->getIssuer(),
+        implode(',', $ssl->getAdditionalDomains())
+    );
+print $msg;
