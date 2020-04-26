@@ -16,7 +16,7 @@ $zoneMgmt = new CFBuddy\ZoneMgmt();
 $skippedZones = [];
 
 foreach ($zones as $index => $zone) {
-    $zone = idn_to_ascii(trim($zone));
+    $zone = idn_to_ascii(trim($zone), IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
     print "........................$index. Processing the zone $zone......................\n";
 
     // Check zoneID
