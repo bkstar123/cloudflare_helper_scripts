@@ -1,6 +1,6 @@
 <?php
 /**
- * Interact with Cloudflare API to manage zone firewall rule configuration
+ * Interact with Cloudflare API to manage firewall rule configuration for a zone
  *
  * @author: tuanha
  */
@@ -11,11 +11,12 @@ use Exception;
 class CFZoneFW
 {
     /**
-     * Upload new custom certificate for a zone
+     * Create a new firewall rule for a zone
      *
      * @param string $zoneID
-     * @param string $cert
-     * @param string $key
+     * @param string $action
+     * @param array $filter
+     * @param string $description
      * @return boolean
      */
     public function createFirewallRule($zoneID, $action, $filter, $description)
