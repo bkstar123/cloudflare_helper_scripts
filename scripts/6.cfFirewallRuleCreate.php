@@ -36,7 +36,7 @@ foreach ($zones as $index => $zone) {
 
     // Create new firewall rule
     print "Start creating new firewall rule...\n";
-    if (!$zoneFW->createFirewallRule($zoneID, $action, $filter, $description )) {
+    if (!$zoneFW->createFirewallRule($zoneID, $action, $filter, $description)) {
         print "Failed to create the firewall rule for the zone $zone, skip it for now. Please manually verify on Cloudflare\n";
         array_push($skippedZones, $zone);
         continue;

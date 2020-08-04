@@ -11,8 +11,9 @@ use Spatie\SslCertificate\SslCertificate;
 $certificate = file_get_contents(__DIR__ . '/../input/' . $_ENV['CHECKSSL_CERTFILE']);
 $ssl = SslCertificate::createFromString($certificate);
 $msgFormat = "CN: %s,\nOrganization: %s,\nOrganization Unit: %s,\nLocality: %s,\nState: %s,\nCountry: %s,\nValid from: %s,\nValid until: %s,\nIssuer: %s,\nSAN: %s\n";
-    $msg = sprintf($msgFormat, 
-        $ssl->getDomain(), 
+    $msg = sprintf(
+        $msgFormat,
+        $ssl->getDomain(),
         $ssl->getOrganization(),
         $ssl->getRawCertificateFields()['subject']['OU'] ?? '',
         $ssl->getRawCertificateFields()['subject']['L'] ?? '',
