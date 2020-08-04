@@ -1,0 +1,11 @@
+<?php
+/**
+ * Define inputs for your Cloudflare Firewall rule
+ *
+ * @author: tuanha
+ */
+return [
+    'action' => 'Valid values: block, challenge, js_challenge, allow, log, bypass',
+    'expression' => 'Your CF firewall rule expression',
+    'description' => 'Describe your rule'
+];

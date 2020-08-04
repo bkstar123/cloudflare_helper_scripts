@@ -21,7 +21,7 @@ class CFServiceBase
     public function __construct()
     {
         $this->client = new Client([
-            'base_uri' => 'https://api.cloudflare.com/client/v4/',
+            'base_uri' => $_ENV['CF_BASE_URI'],
             'headers' => [
                 'X-Auth-Email' => $_ENV['CF_API_EMAIL'],
                 'X-Auth-Key'   => $_ENV['CF_API_KEY'],

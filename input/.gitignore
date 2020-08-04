@@ -1,3 +1,4 @@
 *
 !.gitignore
 !5.tlds.txt
+!6.cffirewall_rule_params.php.example

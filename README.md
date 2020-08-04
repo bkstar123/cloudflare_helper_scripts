@@ -12,7 +12,7 @@ This repository provides some helper scripts to interact with Cloudflare API. At
 ### Installation
 
 - Firstly, download the repository to your local machine and run ```composer install``` to install all the dependent packages.  
-- Rename ```.env.example``` to ```.env```, put your Cloudflare API key to ```.env``` and create all necessary files in the ***input*** directory (naming them after the ones you specify in the ```.env```)  
+- Rename ```.env.example``` to ```.env```, put your Cloudflare API key to ```.env``` , rename ```6.cffirewall_rule_params.php.example``` to ```6.cffirewall_rule_params.php```, and create all necessary files in the ***input*** directory (naming them after the ones you specify in the ```.env```)  
 
 ### Execution
 
@@ -23,4 +23,5 @@ php 1.cfUploadSSLCert.php
 php 3.checkSSLFromCertFile.php
 php 4.checkSSLFromURL.php
 php 5.filterApexRootDomain.php
+php 6.cfFirewallRuleCreate.php
 ```
