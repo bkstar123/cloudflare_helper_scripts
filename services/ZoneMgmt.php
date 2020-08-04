@@ -20,7 +20,7 @@ class ZoneMgmt extends CFServiceBase
      */
     public function getZoneID($zoneName)
     {
-        $url = "zones?name=$zoneName";
+        $url = "zones?name=$zoneName&status=active";
         try {
             $res = $this->client->request('GET', $url);
             $data = json_decode($res->getBody()->getContents(), true);
