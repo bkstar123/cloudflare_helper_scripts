@@ -47,6 +47,6 @@ foreach ($zones as $index => $zone) {
 }
 
 if (!empty($skippedZones)) {
-    print "The following zones were skipped, please manually verify their existence on Cloudflare\n";
+    print "The following zones were skipped, please manually verify them on Cloudflare\n";
     print json_encode($skippedZones) . "\n";
 }
