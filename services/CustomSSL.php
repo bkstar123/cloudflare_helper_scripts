@@ -7,6 +7,7 @@
 namespace CFBuddy;
 
 use Exception;
+use CFBuddy\ZoneMgmt;
 use CFBuddy\CFServiceBase;
 
 class CustomSSL extends CFServiceBase
@@ -27,17 +28,13 @@ class CustomSSL extends CFServiceBase
                 if (empty($data["result"])) {
                     return null; // No existing certs found
                 } elseif (count($data["result"]) > 1) {
-                    print "There are more than one custom certificate installed for the given zone\n";
                     return false; // Do not expect to see more than one custom certificate there, stop and manually verify on Cloudflare
                 }
                 return $data["result"][0]["id"]; // The Id of the current certificate
             } else {
-                print "Cannot check the current SSL configuration for the given zone due to unknown reason from Cloudflare\n";
                 return false;
             }
         } catch (Exception $e) {
-            print "Failed to make request to the Cloudflare\n";
-            print "************\nError: {$e->getMessage()}************\n";
             return false;
         }
     }
@@ -66,8 +63,6 @@ class CustomSSL extends CFServiceBase
             $data = json_decode($res->getBody()->getContents(), true);
             return $data["success"];
         } catch (Exception $e) {
-            print "Failed to make request to the Cloudflare\n";
-            print "************\nError: {$e->getMessage()}************\n";
             return false;
         }
     }
@@ -87,8 +82,6 @@ class CustomSSL extends CFServiceBase
             $data = json_decode($res->getBody()->getContents(), true);
             return $data['success'];
         } catch (Exception $e) {
-            print "Failed to make request to the Cloudflare\n";
-            print "************\nError: {$e->getMessage()}************\n";
             return false;
         }
     }
@@ -104,6 +97,8 @@ class CustomSSL extends CFServiceBase
      */
     public function fetchCertData($zone, $zoneID, $certID, $fh)
     {
+        $zoneMgmt = new ZoneMgmt();
+        $sslMode = $zoneMgmt->getZoneSSLMode($zoneID);
         $url = "zones/$zoneID/custom_certificates/$certID";
         try {
             $res = $this->client->request('GET', $url);
@@ -113,6 +108,7 @@ class CustomSSL extends CFServiceBase
                     $zone,
                     'true',
                     $data['result']['issuer'],
+                    $sslMode ?? null,
                     $data['result']['uploaded_on'],
                     $data['result']['modified_on'],
                     $data['result']['expires_on'],
@@ -120,12 +116,9 @@ class CustomSSL extends CFServiceBase
                 ]);
                 return true;
             } else {
-                print "Cannot check the current SSL configuration for the given zone due to unknown reason from Cloudflare\n";
                 return false;
             }
         } catch (Exception $e) {
-            print "Failed to make request to the Cloudflare\n";
-            print "************\nError: {$e->getMessage()}************\n";
             return false;
         }
     }

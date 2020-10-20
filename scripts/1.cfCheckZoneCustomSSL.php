@@ -11,7 +11,7 @@ $zones = explode(',', $list);
 
 // Open file for writing the output in csv format, insert the field headers
 $fh = fopen(__DIR__ . '/../output/' . $_ENV['CFCHECK_RESULT'], 'w');
-fputcsv($fh, ['URL', 'Found on Cloudflare', 'Issuer', 'SSL uploaded on', 'SSL modified on', 'Expired_at', 'Hosts']);
+fputcsv($fh, ['URL', 'Found on Cloudflare', 'Issuer', 'SSL mode', 'SSL uploaded on', 'SSL modified on', 'Expired_at', 'Hosts']);
 
 $customSSL = new CFBuddy\CustomSSL();
 $zoneMgmt = new CFBuddy\ZoneMgmt();
@@ -23,7 +23,7 @@ foreach ($zones as $index => $zone) {
     // Check zoneID
     $zoneID = $zoneMgmt->getZoneID($zone);
     if ($zoneID === null || $zoneID === false) {
-        print "Failed to check the zone $zone details, skip it for now. Please manually verify on Cloudflare\n";
+        print "Failed to check the zone $zone details, skip it for now. Please manually verify it on Cloudflare\n";
         fputcsv($fh, [$zone, 'false', '', '', '', '', '']);
         continue;
     }
@@ -35,15 +35,15 @@ foreach ($zones as $index => $zone) {
      */
     $currentCertID = $customSSL->getCurrentCustomCertID($zoneID);
     if ($currentCertID === false) {
-        print "Found some issue with the zone $zone while checking its current SSL configuration. Please manualy verify on Cloudflare\n";
+        print "Found some issue with the zone $zone while checking its current SSL configuration. Please manualy verify it on Cloudflare\n";
         break;
     } elseif ($currentCertID === null) {
         print "No current certificate found for the zone $zone\n";
-        fputcsv($fh, [$zone, 'true', '', '', '', '', '']);
+        fputcsv($fh, [$zone, 'true', '', '', '', '', '', '']);
     } else {
         print "A custom certificate found. Fetching its data...\n";
         if (!$customSSL->fetchCertData($zone, $zoneID, $currentCertID, $fh)) {
-            print "Failed to fetch the current certificate data for the zone $zone due to an error. Please manually verify on Cloudflare\n";
+            print "Failed to fetch the current certificate data for the zone $zone due to an error. Please manually verify it on Cloudflare\n";
             break;
         }
     }

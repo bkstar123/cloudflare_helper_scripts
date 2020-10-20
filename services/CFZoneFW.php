@@ -48,8 +48,6 @@ class CFZoneFW
         curl_close($curl);
 
         if ($err) {
-            print "Failed to make request to the Cloudflare\n";
-            print "************\nError: {$err}************\n";
             return false;
         } else {
             return json_decode($result)->success;

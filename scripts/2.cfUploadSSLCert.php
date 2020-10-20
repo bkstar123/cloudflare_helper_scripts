@@ -34,7 +34,7 @@ foreach ($zones as $index => $zone) {
      */
     $currentCertID = $customSSL->getCurrentCustomCertID($zoneID);
     if ($currentCertID === false) {
-        print "Found some issue with the zone $zone while checking its current SSL configuration. Please manualy verify on Cloudflare\n";
+        print "Found some issues with the zone $zone while checking its current SSL configuration. Please manualy verify it on Cloudflare\n";
         break;
     } elseif ($currentCertID === null) {
         print "No current certificate found for the zone $zone\n";
@@ -51,7 +51,7 @@ foreach ($zones as $index => $zone) {
     // Upload new certificate
     print "Start uploading new certificate...\n";
     if (!$customSSL->uploadNewCustomCert($zoneID, $cert, $key)) {
-        print "Failed to upload a custom certificate for the zone $zone. Please manually verify on Cloudflare\n";
+        print "Failed to upload a custom certificate for the zone $zone. Please manually verify it on Cloudflare\n";
         break;
     }
 
