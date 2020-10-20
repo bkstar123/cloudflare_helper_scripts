@@ -59,4 +59,38 @@ class ZoneMgmt extends CFServiceBase
             return false;
         }
     }
+
+    /**
+     * Get the list of Cloudflare zones
+     *
+     * @param integer $page
+     * @return mixed 
+     */
+    public function getZones($page, $perPage)
+    {
+        $zones = [];
+        $url = "zones?per_page=$perPage&page=$page";
+        try {
+            $res = $this->client->request('GET', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                if (!empty($data['result'])) {
+                    $zones = array_map(function($zone) {
+                        return [
+                            'id' => $zone['id'],
+                            'name' => $zone['name']
+                        ];
+                    }, $data['result']);
+                    return $zones;
+                } else {
+                    return null;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+
+    }
 }
