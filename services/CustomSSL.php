@@ -122,4 +122,33 @@ class CustomSSL extends CFServiceBase
             return false;
         }
     }
+
+    /**
+     * Update an existing custom certificate for a zone
+     *
+     * @param string $zoneID
+     * @param string $certID
+     * @param string $cert
+     * @param string $key
+     * @return boolean
+     */
+    public function updateCustomCert($zoneID, $certID, $cert, $key)
+    {
+        $url = "zones/$zoneID/custom_certificates/$certID";
+        $uploadData = [
+            "certificate" => $cert,
+            "private_key" => $key,
+            "bundle_method" => "ubiquitous"
+        ];
+        $options = [
+            'body' => json_encode($uploadData, JSON_UNESCAPED_SLASHES)
+        ];
+        try {
+            $res = $this->client->request('PATCH', $url, $options);
+            $data = json_decode($res->getBody()->getContents(), true);
+            return $data["success"];
+        } catch (Exception $e) {
+            return false;
+        }
+    }
 }
