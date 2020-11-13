@@ -37,24 +37,19 @@ foreach ($zones as $index => $zone) {
         print "Found some issues with the zone $zone while checking its current SSL configuration. Please manualy verify it on Cloudflare\n";
         break;
     } elseif ($currentCertID === null) {
-        print "No current certificate found for the zone $zone\n";
+        print "No existing certificate found for the zone $zone\n";
+        print "Uploading certificate for the zone $zone\n";
+        if (!$customSSL->uploadNewCustomCert($zoneID, $cert, $key)) {
+            print "Failed to upload a custom certificate for the zone $zone. Please manually verify it on Cloudflare\n";
+            break;
+        }
     } else {
-        print "A custom certificate found. Removing the current certificate...\n";
-        if ($customSSL->removeCurrentCert($zoneID, $currentCertID)) {
-            print "The current custom certificate has been successfully removed\n";
-        } else {
-            print "An errror occured while trying to remove the current certificate. Please manually verify on Cloudflare\n";
+        print "An existing SSL configuration found. Updating the current certificate...\n";
+        if (!$customSSL->updateCustomCert($zoneID, $currentCertID, $cert, $key)) {
+            print "Failed to update the existing SSL configuration for the zone $zone. Please manually verify it on Cloudflare\n";
             break;
         }
     }
-
-    // Upload new certificate
-    print "Start uploading new certificate...\n";
-    if (!$customSSL->uploadNewCustomCert($zoneID, $cert, $key)) {
-        print "Failed to upload a custom certificate for the zone $zone. Please manually verify it on Cloudflare\n";
-        break;
-    }
-
     // Update progress
     print ceil(($index + 1)/count($zones)*100) . "% - Completed $zone\n";
 }
