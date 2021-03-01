@@ -91,6 +91,34 @@ class ZoneMgmt extends CFServiceBase
         } catch (Exception $e) {
             return false;
         }
+    }
 
+    public function getFWAccessRules($zoneID, $page, $perPage)
+    {
+        $url = "zones/$zoneID/firewall/access_rules/rules?page=$page&per_page=$perPage";
+        try {
+            $res = $this->client->request('GET', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                if (!empty($data['result'])) {
+                    $rules = array_map(function($rule) {
+                        return [
+                            'target' => $rule['configuration']['target'],
+                            'value' => $rule['configuration']['value'],
+                            'mode' => $rule['mode'],
+                            'paused' => $rule['paused'],
+                            'notes' => $rule['notes']
+                        ];
+                    }, $data['result']);
+                    return $rules;
+                } else {
+                    return null;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }
