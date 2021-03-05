@@ -7,8 +7,9 @@
 namespace CFBuddy;
 
 use Exception;
+use CFBuddy\CFServiceBase;
 
-class CFZoneFW
+class CFZoneFW extends CFServiceBase
 {
     /**
      * Create a new firewall rule for a zone
@@ -51,6 +52,43 @@ class CFZoneFW
             return false;
         } else {
             return json_decode($result)->success;
+        }
+    }
+
+    /**
+     * Get Firewall access rule for a zone
+     *
+     * @param string $zoneID
+     * @param int $page
+     * @param int $perPage
+     * @return mixed (false | array)
+     */
+    public function getFWAccessRules($zoneID, $page, $perPage)
+    {
+        $url = "zones/$zoneID/firewall/access_rules/rules?page=$page&per_page=$perPage";
+        try {
+            $res = $this->client->request('GET', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                if (!empty($data['result'])) {
+                    $rules = array_map(function($rule) {
+                        return [
+                            'target' => $rule['configuration']['target'],
+                            'value' => $rule['configuration']['value'],
+                            'mode' => $rule['mode'],
+                            'paused' => $rule['paused'],
+                            'notes' => $rule['notes']
+                        ];
+                    }, $data['result']);
+                    return $rules;
+                } else {
+                    return null;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
         }
     }
 }

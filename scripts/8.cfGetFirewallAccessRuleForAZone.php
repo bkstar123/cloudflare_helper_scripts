@@ -10,13 +10,14 @@ require(__DIR__.'/../bootstrap.php');
 $fh = fopen(__DIR__ . '/../output/cfFirewallAccessRules.csv', 'w');
 fputcsv($fh, ['Target', 'Value', 'Mode', 'Paused', 'Note']);
 
+$cfZoneFW = new CFBuddy\CFZoneFW();
 $zoneMgmt = new CFBuddy\ZoneMgmt();
 $zone = 'thedoctors.com';
 
 $page = 1;
 $perPage = 300;
 
-$rules = $zoneMgmt->getFWAccessRules($zoneMgmt->getZoneID($zone), $page, 300);
+$rules = $cfZoneFW->getFWAccessRules($zoneMgmt->getZoneID($zone), $page, 300);
 
 foreach ($rules as $rule) {
 	fputcsv($fh, [
