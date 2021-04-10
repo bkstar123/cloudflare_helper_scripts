@@ -12,7 +12,7 @@ fputcsv($fh, ['Target', 'Value', 'Mode', 'Paused', 'Note']);
 
 $cfZoneFW = new CFBuddy\CFZoneFW();
 $zoneMgmt = new CFBuddy\ZoneMgmt();
-$zone = 'thedoctors.com';
+$zone = 'your.zone';
 
 $page = 1;
 $perPage = 300;
