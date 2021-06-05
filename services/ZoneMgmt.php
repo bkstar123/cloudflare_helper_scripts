@@ -64,6 +64,7 @@ class ZoneMgmt extends CFServiceBase
      * Get the list of Cloudflare zones
      *
      * @param integer $page
+     * @param integer $perPage
      * @return mixed 
      */
     public function getZones($page, $perPage)
@@ -91,5 +92,42 @@ class ZoneMgmt extends CFServiceBase
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Get the list of DNS record for the given zone (only A & CNAME included)
+     *
+     * @param string $zoneID
+     * @param integer $page
+     * @param integer $perPage
+     * @return mixed 
+     */
+    public function getDnsRecords($zoneID, $page, $perPage)
+    {
+        $dns_records = [];
+        $url = "zones/$zoneID/dns_records?per_page=$perPage&page=$page";
+        try {
+            $res = $this->client->request('GET', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                if (!empty($data['result'])) {
+                    $dns_records = array_filter($data['result'], function($record) {
+                        return ($record['type'] == 'CNAME' || $record['type'] == 'A') && 
+                            !preg_match('/^awverify.*$/', $record['name']);
+                    });
+                    $dns_records = array_map(function($record) {
+                        return $record['name'];
+                    }, $dns_records);
+                    return $dns_records;
+                } else {
+                    return null;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+
     }
 }
