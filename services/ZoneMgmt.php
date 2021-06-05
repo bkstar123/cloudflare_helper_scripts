@@ -95,16 +95,37 @@ class ZoneMgmt extends CFServiceBase
     }
 
     /**
-     * Get the list of DNS record for the given zone (only A & CNAME included)
+     * Get the list of all sub domains for the given zone
+     *
+     * @param string $zoneID
+     * @return array 
+     */
+    public function getZoneSubDomains($zoneID)
+    {
+        $zoneSubDomains = [];
+        $page = 1;
+        do {
+            $data = $this->getZoneSubDomainsByPage($zoneID, $page, 100);
+            if (empty($data)) {
+                break;
+            }
+            $zoneSubDomains = array_merge($zoneSubDomains, $data);
+            ++$page;
+        } while (!empty($data));
+        return $zoneSubDomains;
+    }
+
+    /**
+     * Get the list of sub domains for the given zone by the given page
      *
      * @param string $zoneID
      * @param integer $page
      * @param integer $perPage
-     * @return mixed 
+     * @return null|array 
      */
-    public function getDnsRecords($zoneID, $page, $perPage)
+    protected function getZoneSubDomainsByPage($zoneID, $page, $perPage)
     {
-        $dns_records = [];
+        $subDomains = [];
         $url = "zones/$zoneID/dns_records?per_page=$perPage&page=$page";
         try {
             $res = $this->client->request('GET', $url);
@@ -115,19 +136,18 @@ class ZoneMgmt extends CFServiceBase
                         return ($record['type'] == 'CNAME' || $record['type'] == 'A') && 
                             !preg_match('/^awverify.*$/', $record['name']);
                     });
-                    $dns_records = array_map(function($record) {
+                    $subDomains = array_map(function($record) {
                         return $record['name'];
                     }, $dns_records);
-                    return $dns_records;
+                    return $subDomains;
                 } else {
                     return null;
                 }
             } else {
-                return false;
+                return null;
             }
         } catch (Exception $e) {
-            return false;
+            return null;
         }
-
     }
 }
