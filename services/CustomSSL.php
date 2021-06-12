@@ -167,7 +167,7 @@ class CustomSSL extends CFServiceBase
             $data = json_decode($res->getBody()->getContents(), true);
             if ($data["success"]) {
                 $oldSAN = $data['result']['hosts'];
-                $certDomains = $this->getCertificateDomain($zoneID, $cert);
+                $certDomains = $this->getCertificateDomain($cert);
                 $diff = array_merge([], array_diff($oldSAN, $certDomains));
                 return [
                     'isOK' => empty($diff),
@@ -188,11 +188,10 @@ class CustomSSL extends CFServiceBase
     }
 
     /** 
-     * @param string $zoneID
      * @param string $cert
      * @return array
      */
-    protected function getCertificateDomain($zoneID, $cert)
+    protected function getCertificateDomain($cert)
     {
         try {
             $ssl = SslCertificate::createFromString($cert);
