@@ -1,6 +1,6 @@
 <?php
 /**
- * Fetch the custom SSL configuration for Cloudflare zones
+ * Check how many custom SSL configurations are set for each zone
  *
  * @author: tuanha
  */
@@ -23,22 +23,22 @@ do {
         print "Checking SSL mode for zone " . $zone['name'] . "\n";
         $currentCertID = $customSSL->getCurrentCustomCertID($zone['id']);
         if ($currentCertID === false) {
-                fputcsv($fh, [
-                    'Zone' => $zone['name'],
-                    'Note' => 'Something is unusual, please manually double check in the Cloudflare portal'
-                ]);
-                continue;
-            } elseif ($currentCertID === null) {
-                fputcsv($fh, [
-                    'Zone' => $zone['name'],
-                    'Note' => 'No custom SSL setting'
-                ]);
-            } else {  
-                fputcsv($fh, [
-                    'Zone' => $zone['name'],
-                    'Note' => '01 custom SSL setting detected'
-                ]);
-            }
+            fputcsv($fh, [
+                'Zone' => $zone['name'],
+                'Note' => 'Something is unusual, please manually double check in the Cloudflare portal'
+            ]);
+            continue;
+        } elseif ($currentCertID === null) {
+            fputcsv($fh, [
+                'Zone' => $zone['name'],
+                'Note' => 'No custom SSL setting'
+            ]);
+        } else {  
+            fputcsv($fh, [
+                'Zone' => $zone['name'],
+                'Note' => '01 custom SSL setting detected'
+            ]);
+        }
         print "Proceeded " . $zone['name'] . "\n";
     }
     ++$page;
