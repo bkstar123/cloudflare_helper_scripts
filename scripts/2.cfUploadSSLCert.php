@@ -45,10 +45,16 @@ foreach ($zones as $index => $zone) {
         }
     } else {
         print "An existing SSL configuration found. Updating the current certificate...\n";
-        if (!$customSSL->updateCustomCert($zoneID, $currentCertID, $cert, $key)) {
-            print "Failed to update the existing SSL configuration for the zone $zone. Please manually verify it on Cloudflare\n";
-            break;
-        }
+        $validate = $customSSL->preReplaceValidate($zoneID, $currentCertID, $cert);
+        if ($validate['isOK']) {
+            if (!$customSSL->updateCustomCert($zoneID, $currentCertID, $cert, $key)) {
+                print "Failed to update the existing SSL configuration for the zone $zone. Please manually verify it on Cloudflare\n";
+                break;
+            }
+        } else {
+            print "Not OK to replace ssl for this zone.\n";
+            print "Verify if the certificate covers the following domains: " . json_encode($validate['diff']) . "\n";
+        }    
     }
     // Update progress
     print ceil(($index + 1)/count($zones)*100) . "% - Completed $zone\n";

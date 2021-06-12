@@ -9,6 +9,7 @@ namespace CFBuddy;
 use Exception;
 use CFBuddy\ZoneMgmt;
 use CFBuddy\CFServiceBase;
+use Spatie\SslCertificate\SslCertificate;
 
 class CustomSSL extends CFServiceBase
 {
@@ -149,6 +150,55 @@ class CustomSSL extends CFServiceBase
             return $data["success"];
         } catch (Exception $e) {
             return false;
+        }
+    }
+
+    /** 
+     * @param string $zoneID
+     * @param string $certID
+     * @param string $cert
+     * @return array
+     */
+    public function preReplaceValidate($zoneID, $certID, $cert)
+    {
+        $url = "zones/$zoneID/custom_certificates/$certID";
+        try {
+            $res = $this->client->request('GET', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                $oldSAN = $data['result']['hosts'];
+                $certDomains = $this->getCertificateDomain($zoneID, $cert);
+                $diff = array_merge([], array_diff($oldSAN, $certDomains));
+                return [
+                    'isOK' => empty($diff),
+                    'diff' => $diff
+                ];
+            } else {
+                return [
+                    'isOK' => false,
+                    'diff' => []
+                ];
+            }
+        } catch (Exception $e) {
+            return [
+                'isOK' => false,
+                'diff' => []
+            ];   
+        }
+    }
+
+    /** 
+     * @param string $zoneID
+     * @param string $cert
+     * @return array
+     */
+    protected function getCertificateDomain($zoneID, $cert)
+    {
+        try {
+            $ssl = SslCertificate::createFromString($cert);
+            return $ssl->getAdditionalDomains();
+        } catch (Exception $e) {
+            return [];
         }
     }
 }
