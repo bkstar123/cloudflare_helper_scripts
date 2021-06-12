@@ -67,7 +67,7 @@ class ZoneMgmt extends CFServiceBase
      * @param integer $perPage
      * @return mixed 
      */
-    public function getZones($page, $perPage)
+    public function getZones($page = 1, $perPage = 100)
     {
         $zones = [];
         $url = "zones?per_page=$perPage&page=$page";
@@ -123,7 +123,7 @@ class ZoneMgmt extends CFServiceBase
      * @param integer $perPage
      * @return null|array 
      */
-    protected function getZoneSubDomainsByPage($zoneID, $page, $perPage)
+    protected function getZoneSubDomainsByPage($zoneID, $page = 1, $perPage = 100)
     {
         $subDomains = [];
         $url = "zones/$zoneID/dns_records?per_page=$perPage&page=$page";
