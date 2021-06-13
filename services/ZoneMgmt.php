@@ -65,7 +65,7 @@ class ZoneMgmt extends CFServiceBase
      *
      * @param integer $page
      * @param integer $perPage
-     * @return mixed 
+     * @return array|false 
      */
     public function getZones($page = 1, $perPage = 100)
     {
@@ -84,7 +84,7 @@ class ZoneMgmt extends CFServiceBase
                     }, $data['result']);
                     return $zones;
                 } else {
-                    return null;
+                    return [];
                 }
             } else {
                 return false;
@@ -105,7 +105,7 @@ class ZoneMgmt extends CFServiceBase
         $zoneSubDomains = [];
         $page = 1;
         do {
-            $data = $this->getZoneSubDomainsByPage($zoneID, $page, 100);
+            $data = $this->getZonePaginatedSubDomains($zoneID, $page, 100);
             if (empty($data)) {
                 break;
             }
@@ -121,9 +121,9 @@ class ZoneMgmt extends CFServiceBase
      * @param string $zoneID
      * @param integer $page
      * @param integer $perPage
-     * @return null|array 
+     * @return array|false
      */
-    protected function getZoneSubDomainsByPage($zoneID, $page = 1, $perPage = 100)
+    protected function getZonePaginatedSubDomains($zoneID, $page = 1, $perPage = 100)
     {
         $subDomains = [];
         $url = "zones/$zoneID/dns_records?per_page=$perPage&page=$page";
@@ -133,21 +133,20 @@ class ZoneMgmt extends CFServiceBase
             if ($data["success"]) {
                 if (!empty($data['result'])) {
                     $dns_records = array_filter($data['result'], function($record) {
-                        return ($record['type'] == 'CNAME' || $record['type'] == 'A') && 
-                            !preg_match('/^awverify.*$/', $record['name']);
+                        return $record['type'] == 'CNAME' || $record['type'] == 'A';
                     });
                     $subDomains = array_map(function($record) {
                         return $record['name'];
                     }, $dns_records);
                     return $subDomains;
                 } else {
-                    return null;
+                    return [];
                 }
             } else {
-                return null;
+                return false;
             }
         } catch (Exception $e) {
-            return null;
+            return false;
         }
     }
 }
