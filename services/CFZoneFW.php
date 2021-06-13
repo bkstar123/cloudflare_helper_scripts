@@ -82,7 +82,7 @@ class CFZoneFW extends CFServiceBase
                     }, $data['result']);
                     return $rules;
                 } else {
-                    return null;
+                    return [];
                 }
             } else {
                 return false;
