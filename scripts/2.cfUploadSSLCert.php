@@ -54,7 +54,7 @@ foreach ($zones as $index => $zone) {
         } else {
             print "Not OK to replace ssl for this zone.\n";
             print "Verify if the certificate covers the following domains: " . json_encode($validate['diff']) . "\n";
-        }    
+        }
     }
     // Update progress
     print ceil(($index + 1)/count($zones)*100) . "% - Completed $zone\n";

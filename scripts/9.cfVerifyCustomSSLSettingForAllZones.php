@@ -33,7 +33,7 @@ do {
                 'Zone' => $zone['name'],
                 'Note' => 'No custom SSL setting'
             ]);
-        } else {  
+        } else {
             fputcsv($fh, [
                 'Zone' => $zone['name'],
                 'Note' => '01 custom SSL setting detected'

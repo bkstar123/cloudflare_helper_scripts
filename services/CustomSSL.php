@@ -153,7 +153,7 @@ class CustomSSL extends CFServiceBase
         }
     }
 
-    /** 
+    /**
      * @param string $zoneID
      * @param string $certID
      * @param string $cert
@@ -183,11 +183,11 @@ class CustomSSL extends CFServiceBase
             return [
                 'isOK' => false,
                 'diff' => []
-            ];   
+            ];
         }
     }
 
-    /** 
+    /**
      * @param string $cert
      * @return array
      */

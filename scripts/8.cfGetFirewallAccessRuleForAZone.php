@@ -20,12 +20,12 @@ $perPage = 300;
 $rules = $cfZoneFW->getFWAccessRules($zoneMgmt->getZoneID($zone), $page, 300);
 
 foreach ($rules as $rule) {
-	fputcsv($fh, [
-		$rule['target'], 
-		$rule['value'],
-		$rule['mode'],
-		$rule['paused'],
-		$rule['notes']
-	]);
+    fputcsv($fh, [
+        $rule['target'],
+        $rule['value'],
+        $rule['mode'],
+        $rule['paused'],
+        $rule['notes']
+    ]);
 }
 fclose($fh);

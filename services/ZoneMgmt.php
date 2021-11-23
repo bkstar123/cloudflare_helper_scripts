@@ -65,7 +65,7 @@ class ZoneMgmt extends CFServiceBase
      *
      * @param integer $page
      * @param integer $perPage
-     * @return array|false 
+     * @return array|false
      */
     public function getZones($page = 1, $perPage = 100)
     {
@@ -76,7 +76,7 @@ class ZoneMgmt extends CFServiceBase
             $data = json_decode($res->getBody()->getContents(), true);
             if ($data["success"]) {
                 if (!empty($data['result'])) {
-                    $zones = array_map(function($zone) {
+                    $zones = array_map(function ($zone) {
                         return [
                             'id' => $zone['id'],
                             'name' => $zone['name']
@@ -98,7 +98,7 @@ class ZoneMgmt extends CFServiceBase
      * Get the list of all sub domains for the given zone
      *
      * @param string $zoneID
-     * @return array 
+     * @return array
      */
     public function getZoneSubDomains($zoneID)
     {
@@ -132,15 +132,46 @@ class ZoneMgmt extends CFServiceBase
             $data = json_decode($res->getBody()->getContents(), true);
             if ($data["success"]) {
                 if (!empty($data['result'])) {
-                    $dns_records = array_filter($data['result'], function($record) {
+                    $dns_records = array_filter($data['result'], function ($record) {
                         return $record['type'] == 'CNAME' || $record['type'] == 'A';
                     });
-                    $subDomains = array_map(function($record) {
+                    $subDomains = array_map(function ($record) {
                         return $record['name'];
                     }, $dns_records);
                     return $subDomains;
                 } else {
                     return [];
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Get DNS record for a zone
+     *
+     * @param $zoneID string
+     * @param $name string
+     *
+     * @return string
+     */
+    public function getCFDnsCnameForACustomDomain($zoneID, $name)
+    {
+        $url = "zones/$zoneID/dns_records?name=$name";
+        try {
+            $res = $this->client->request('GET', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                if (!empty($data['result'])) {
+                    $dns_records = array_filter($data['result'], function ($record) {
+                        return $record['type'] == 'CNAME';
+                    });
+                    return $dns_records[0]['content'];
+                } else {
+                    return '';
                 }
             } else {
                 return false;

@@ -71,7 +71,7 @@ class CFZoneFW extends CFServiceBase
             $data = json_decode($res->getBody()->getContents(), true);
             if ($data["success"]) {
                 if (!empty($data['result'])) {
-                    $rules = array_map(function($rule) {
+                    $rules = array_map(function ($rule) {
                         return [
                             'target' => $rule['configuration']['target'],
                             'value' => $rule['configuration']['value'],
