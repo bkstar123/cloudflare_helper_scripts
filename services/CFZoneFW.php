@@ -8,6 +8,9 @@ namespace CFBuddy;
 
 use Exception;
 use CFBuddy\CFServiceBase;
+use CFBuddy\CFFWRule\CFFWRule;
+use CFBuddy\CFFWRule\CFFWRuleFilter;
+use CFBuddy\CFFWAccessRule\CFFWAccessRule;
 
 class CFZoneFW extends CFServiceBase
 {
@@ -15,43 +18,156 @@ class CFZoneFW extends CFServiceBase
      * Create a new firewall rule for a zone
      *
      * @param string $zoneID
-     * @param string $action
-     * @param array $filter
-     * @param string $description
+     * @param \CFBuddy\CFFWRule $rule
      * @return boolean
      */
-    public function createFirewallRule($zoneID, $action, $filter, $description)
+    public function createFirewallRule($zoneID, $rule)
     {
-        $payload = [
-            "action" => $action,
-            "filter" => $filter,
-            'description' => $description
+        $options = [
+            'body' => '[' . json_encode($rule->toArray()) . ']'
         ];
         $url = "zones/$zoneID/firewall/rules";
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => $_ENV['CF_BASE_URI'] . $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => '['.json_encode($payload).']',
-            CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json",
-                "X-Auth-Key: {$_ENV['CF_API_KEY']}",
-                "X-Auth-Email: {$_ENV['CF_API_EMAIL']}"
-            ]
-        ]);
-        $result = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-
-        if ($err) {
+        try {
+            $res = $this->client->request('POST', $url, $options);
+            $data = json_decode($res->getBody()->getContents(), true);
+            return $data['success'];
+        } catch (Exception $e) {
+            // var_dump($e->getResponse()->getBody(true)->getContents());
             return false;
-        } else {
-            return json_decode($result)->success;
+        }
+    }
+
+    /**
+     * Get Firewall rules for a zone by either rule description, or rule id, or rule ref
+     *
+     * @param string $zoneID
+     * @param array $query
+     * @return mixed (false | array of \CFBuddy\CFFWRule objects)
+     */
+    public function getFWRuleForZone($zoneID, array $query)
+    {
+        foreach (array_keys($query) as $key) {
+            if (!in_array($key, ['description', 'id', 'ref'])) {
+                throw new Exception("The second argument of the method getFWRuleForZone() must be an associative array contains one or more of following keys: 'description', id', 'ref'");
+            }
+        }
+        $queryString = http_build_query($query);
+        $url = "zones/$zoneID/firewall/rules?" . $queryString;
+        try {
+            $res = $this->client->request('GET', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                if (!empty($data['result'])) {
+                    $rules = array_map(function ($rule) {
+                        return new CFFWRule(
+                            $rule['description'],
+                            $rule['paused'],
+                            new CFFWRuleFilter($rule['filter']['expression'], $rule['filter']['paused'], $rule['filter']['id']),
+                            $rule['action'],
+                            $rule['id']
+                        );
+                    }, $data['result']);
+                    return $rules;
+                } else {
+                    return [];
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Update a Firewall rule for a zone. It will not update the rule filter
+     *
+     * @param string $zoneID
+     * @param \CFBuddy\CFFWRule $rule
+     * @return boolean
+     */
+    public function updateFWRuleForZone($zoneID, $rule)
+    {
+        $options = [
+            'body' => '[' . json_encode($rule->toArray()) . ']'
+        ];
+        $url = "zones/$zoneID/firewall/rules";
+        try {
+            $res = $this->client->request('PUT', $url, $options);
+            $data = json_decode($res->getBody()->getContents(), true);
+            return $data['success'];
+        } catch (Exception $e) {
+            // var_dump($e->getResponse()->getBody(true)->getContents());
+            return false;
+        }
+    }
+
+    /**
+     * Update a Firewall rule's filter for a zone
+     *
+     * @param string $zoneID
+     * @param \CFBuddy\CFFWRuleFilter $filter
+     * @return boolean
+     */
+    public function updateFWRuleFilterForZone($zoneID, CFFWRuleFilter $filter)
+    {
+        $options = [
+            'body' => '[' . json_encode($filter->toArray()) . ']'
+        ];
+        $url = "zones/$zoneID/filters";
+        try {
+            $res = $this->client->request('PUT', $url, $options);
+            $data = json_decode($res->getBody()->getContents(), true);
+            return $data['success'];
+        } catch (Exception $e) {
+            // var_dump($e->getResponse()->getBody(true)->getContents());
+            return false;
+        }
+    }
+
+    /**
+     * Delete a Firewall rule for a zone, it will not delete the rule's filter
+     *
+     * @param string $zoneID
+     * @param \CFBuddy\CFFWRule $rule
+     * @return boolean
+     */
+    public function deleteFWRuleForZone($zoneID, $rule)
+    {
+        $url = "zones/$zoneID/firewall/rules?id=" . $rule->id;
+        try {
+            $res = $this->client->request('DELETE', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Delete a Firewall rule's filter for a zone
+     *
+     * @param string $zoneID
+     * @param \CFBuddy\CFFWRuleFilter $filter
+     * @return boolean
+     */
+    public function deleteFWRuleFilterForZone($zoneID, $filter)
+    {
+        $url = "zones/$zoneID/filters?id=" . $filter->id;
+        try {
+            $res = $this->client->request('DELETE', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
         }
     }
 
@@ -72,13 +188,13 @@ class CFZoneFW extends CFServiceBase
             if ($data["success"]) {
                 if (!empty($data['result'])) {
                     $rules = array_map(function ($rule) {
-                        return [
-                            'target' => $rule['configuration']['target'],
-                            'value' => $rule['configuration']['value'],
-                            'mode' => $rule['mode'],
-                            'paused' => $rule['paused'],
-                            'notes' => $rule['notes']
-                        ];
+                        return new CFFWAccessRule(
+                            $rule['configuration']['target'],
+                            $rule['configuration']['value'],
+                            $rule['mode'],
+                            $rule['paused'],
+                            $rule['notes']
+                        );
                     }, $data['result']);
                     return $rules;
                 } else {
@@ -90,111 +206,5 @@ class CFZoneFW extends CFServiceBase
         } catch (Exception $e) {
             return false;
         }
-    }
-
-    /**
-     * Query Firewall rules for a zone by description
-     *
-     * @param string $zoneID
-     * @param string $description
-     * @return mixed (false | array)
-     */
-    public function queryFWRuleForZoneByDescription($zoneID, $description)
-    {
-        $queryString = http_build_query([
-            'description' => $description
-        ]);
-        $url = "zones/$zoneID/firewall/rules?" . $queryString;
-        try {
-            $res = $this->client->request('GET', $url);
-            $data = json_decode($res->getBody()->getContents(), true);
-            if ($data["success"]) {
-                if (!empty($data['result'])) {
-                    $rules = array_map(function ($rule) {
-                        return [
-                            'id' => $rule['id'],
-                            'description' => $rule['description'],
-                            'filter.expression' => $rule['filter']['expression'],
-                            'filter.id' => $rule['filter']['id'],
-                            'paused' => $rule['paused'],
-                            'action' => $rule['action']
-                        ];
-                    }, $data['result']);
-                    return $rules;
-                } else {
-                    return [];
-                }
-            } else {
-                return false;
-            }
-        } catch (Exception $e) {
-            return false;
-        }
-
-    }
-
-    /**
-     * Update a Firewall rule for a zone
-     *
-     * @param string $zoneID
-     * @param string $ruleID
-     * @param array $payload
-     * @return boolean
-     */
-    public function updateFWRuleForZone($zoneID, $ruleID, $payload)
-    {
-        $payload = array_merge([
-            'id' => $ruleID
-        ], $payload);
-        $url = "zones/$zoneID/firewall/rules";
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => $_ENV['CF_BASE_URI'] . $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "PUT",
-            CURLOPT_POSTFIELDS => '['.json_encode($payload).']',
-            CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json",
-                "X-Auth-Key: {$_ENV['CF_API_KEY']}",
-                "X-Auth-Email: {$_ENV['CF_API_EMAIL']}"
-            ]
-        ]);
-        $result = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        if ($err) {
-            return false;
-        } else {
-            var_dump($result);die;
-            return json_decode($result)->success;
-        }
-    }
-
-    /**
-     * Delete a Firewall rule for a zone
-     *
-     * @param string $zoneID
-     * @param string $ruleID
-     * @return boolean
-     */
-    public function deleteFWRuleForZone($zoneID, $ruleID)
-    {
-        $url = "zones/$zoneID/firewall/rules/$ruleID";
-        try {
-            $res = $this->client->request('DELETE', $url);
-            $data = json_decode($res->getBody()->getContents(), true);
-            if ($data["success"]) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception $e) {
-            return false;
-        }
-
     }
 }

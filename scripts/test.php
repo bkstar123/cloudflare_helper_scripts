@@ -2,23 +2,46 @@
 
 use CFBuddy\CFZoneFW;
 use CFBuddy\ZoneMgmt;
+use CFBuddy\CFFWRule\CFFWRule;
 
 require(__DIR__.'/../bootstrap.php');
 
 $zoneMgmt = new ZoneMgmt();
 $zoneFW = new CFZoneFW();
 
-$zone = 'example.com';
-$description = 'my rule';
+$zone = 'hattek.net';
+$description = 'tuan hoang';
 $zoneID = $zoneMgmt->getZoneID($zone);
 
 
-// Delete FW rule for a zone
+//Delete FW rule for a zone
+// if ($zoneID) {
+//     $rules = $zoneFW->getFWRuleForZone($zoneID, [
+//     'description' => $description
+//   ]);
+//     if ($rules) {
+//         foreach ($rules as $rule) {
+//             $zoneFW->deleteFWRuleForZone($zoneID, $rule);
+//             $zoneFW->deleteFWRuleFilterForZone($zoneID, $rule->filter);
+//         }
+//     } else {
+//         print "No FW rule found for this zone";
+//     }
+// } else {
+//     print "No zone found";
+// }
+
+// Update FW rule for a zone
 if ($zoneID) {
-  $rules = $zoneFW->queryFWRuleForZoneByDescription($zoneID, $description);
+  $rules = $zoneFW->getFWRuleForZone($zoneID, [
+    'description' => $description
+  ]);
   if ($rules) {
     foreach ($rules as $rule) {
-      $res = $zoneFW->deleteFWRuleForZone($zoneID, $rule['id']);
+      $rule->paused = true;
+      $rule->filter->expression = "(http.request.uri.path contains \".php\") or (http.request.uri.path contains \"/wp-content/\") or (http.request.uri.path contains \"/wp-includes/\") or (http.user_agent contains \"Fuzz Faster U Fool\")";
+      $zoneFW->updateFWRuleForZone($zoneID, $rule);
+      $zoneFW->updateFWRuleFilterForZone($zoneID, $rule->filter);
     }
   } else {
     print "No FW rule found for this zone";
@@ -26,37 +49,3 @@ if ($zoneID) {
 } else {
   print "No zone found";
 }
-
-// Update FW rule for a zone
-
-// $newPayload = [
-//   // "action" => 'block', // optional
-//   "filter" => $filter ?? [],
-//   // 'paused' => false, // optional
-//   'description' => "tuan hoang" //optional
-// ];
-
-
-// if ($zoneID) {
-//   $rules = $zoneFW->queryFWRuleForZoneByDescription($zoneID, $description);
-//   if ($rules) {
-//     foreach ($rules as $rule) {
-//       $newPayload['filter']['id'] = $rule['filter.id'];
-//       if (!isset($newPayload['description'])) {
-//         $newPayload['description'] = $rule['description'];
-//       }
-//       if (!isset($newPayload['action'])) {
-//         $newPayload['action'] = $rule['action'];
-//       }
-//       $res = $zoneFW->updateFWRuleForZone($zoneID, $rule['id'], $newPayload);
-//       if (!$res) {
-//         print "failed";
-//       }
-//     }
-//   } else {
-//     print "No FW rule found for this zone";
-//   }
-// } else {
-//   print "No zone found";
-// }
-

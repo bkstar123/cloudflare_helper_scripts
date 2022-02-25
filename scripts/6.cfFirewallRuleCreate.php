@@ -1,4 +1,8 @@
 <?php
+
+use CFBuddy\CFFWRule\CFFWRule;
+use CFBuddy\CFFWRule\CFFWRuleFilter;
+
 /**
  * Create firewall rules for CF zones
  *
@@ -15,12 +19,8 @@ $zoneMgmt = new CFBuddy\ZoneMgmt();
 $zoneFW = new CFBuddy\CFZoneFW();
 $skippedZones = [];
 
-$action = $config['action'];
-$filter = [
-    'expression' => $config['expression'],
-    'paused' =>  false
-];
-$description = $config['description'];
+$filter = new CFFWRuleFilter($config['expression'], false);
+$rule = new CFFWRule($config['description'], false, $filter, $config['action']);
 
 foreach ($zones as $index => $zone) {
     $zone = idn_to_ascii(trim($zone), IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
@@ -36,7 +36,7 @@ foreach ($zones as $index => $zone) {
 
     // Create new firewall rule
     print "Start creating new firewall rule...\n";
-    if (!$zoneFW->createFirewallRule($zoneID, $action, $filter, $description)) {
+    if (!$zoneFW->createFirewallRule($zoneID, $rule)) {
         print "Failed to create the firewall rule for the zone $zone, skip it for now. Please manually verify on Cloudflare\n";
         array_push($skippedZones, $zone);
         continue;
