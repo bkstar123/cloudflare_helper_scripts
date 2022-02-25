@@ -9,8 +9,8 @@ require(__DIR__.'/../bootstrap.php');
 $zoneMgmt = new ZoneMgmt();
 $zoneFW = new CFZoneFW();
 
-$zone = 'hattek.net';
-$description = 'tuan hoang';
+$zone = 'your.zone';
+$description = 'your description';
 $zoneID = $zoneMgmt->getZoneID($zone);
 
 
