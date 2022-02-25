@@ -12,7 +12,7 @@ fputcsv($fh, ['Target', 'Value', 'Mode', 'Paused', 'Note']);
 
 $cfZoneFW = new CFBuddy\CFZoneFW();
 $zoneMgmt = new CFBuddy\ZoneMgmt();
-$zone = 'your.zone';
+$zone = 'newschool.edu';
 
 $page = 1;
 $perPage = 300;
@@ -25,7 +25,7 @@ foreach ($rules as $rule) {
         $rule->value,
         $rule->mode,
         $rule->paused,
-        $rule->notes
+        $rule->note
     ]);
 }
 fclose($fh);
