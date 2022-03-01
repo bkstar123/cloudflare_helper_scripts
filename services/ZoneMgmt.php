@@ -61,7 +61,7 @@ class ZoneMgmt extends CFServiceBase
     }
 
     /**
-     * Get the list of Cloudflare zones
+     * Get the paginated list of Cloudflare zones for the your account
      *
      * @param integer $page
      * @param integer $perPage
@@ -151,7 +151,7 @@ class ZoneMgmt extends CFServiceBase
     }
 
     /**
-     * Get DNS record for a zone
+     * Get DNS CNAME record for a custom domain of the given zone
      *
      * @param $zoneID string
      * @param $name string

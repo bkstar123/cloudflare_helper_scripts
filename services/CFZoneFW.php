@@ -64,6 +64,7 @@ class CFZoneFW extends CFServiceBase
                             $rule['paused'],
                             new CFFWRuleFilter($rule['filter']['expression'], $rule['filter']['paused'], $rule['filter']['id']),
                             $rule['action'],
+                            $rule['products'] ?? [],
                             $rule['id']
                         );
                     }, $data['result']);
