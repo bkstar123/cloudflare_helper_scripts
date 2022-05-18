@@ -54,10 +54,10 @@ if ($fip) {
                 array_push($lineItemsValues, $lineItems[$header] ?? '-');
             }
             fputcsv($fop, array_values($lineItemsValues));
+            // Update progress
+            ++$index;
+            print "Proceeded line $index" . "\n";
         }
-        // Update progress
-        ++$index;
-        print "Proceeded line $index" . "\n";
     }
 }
 fclose($fip);
