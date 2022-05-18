@@ -6,66 +6,54 @@
  */
 require(__DIR__.'/../bootstrap.php');
 
+// Return true if the given argument is an JSON string
+function isJSONString(string $str)
+{
+    return is_array(json_decode($str, true));
+}
+
+// Return line items in format of a flat [key => value] array
+function prepareCSVDataForEachJSONLine($line)
+{
+    $data = [];
+    if (isJSONString($line)) {
+        $lineItems = json_decode($line, true);
+        foreach ($lineItems as $key => $item) {
+            if (!isJSONString($item)) {
+                $data[$key] = $item;
+            } else {
+                $data = array_merge($data, prepareCSVDataForEachJSONLine($item));
+            }
+        }
+    }
+    return $data;
+}
+
 $fip = fopen(__DIR__ . '/../input/12.http_log.json', 'r');
 $fop = fopen(__DIR__ . '/../output/http_log.csv', 'w');
-fputcsv($fop, [
-    'Category', 
-    'Time', 
-    'Resource ID', 
-    'EventStampType', 
-    'EventPrimaryStampName', 
-    'EventStampName', 
-    'Host', 
-    'EventIpAddress', 
-    'UserAgent',
-    'Cookie',
-    'ScStatus',
-    'CsUsername',
-    'Result',
-    'CsHost',
-    'CsMethod',
-    'CsBytes',
-    'CIp',
-    'SPort',
-    'Referer',
-    'CsUriStem',
-    'TimeTaken',
-    'ScBytes',
-    'ComputerName'
-]);
 
 $index = 0;
 if ($fip) {   
+    // Read JSON file first time to extract headers
+    $headers = [];
     while (!feof($fip)) {
         $line = fgets($fip);
         if ($line) {
-            $lineArray = json_decode($line, true);
-            $properties = json_decode($lineArray['properties'], true);
-            fputcsv($fop, [
-                $lineArray['category'],
-                $lineArray['time'],
-                $lineArray['resourceId'],
-                $lineArray['EventStampType'],
-                $lineArray['EventPrimaryStampName'],
-                $lineArray['EventStampName'],
-                $lineArray['Host'],
-                $lineArray['EventIpAddress'],
-                $properties['UserAgent'],
-                $properties['Cookie'],
-                $properties['ScStatus'],
-                $properties['CsUsername'],
-                $properties['Result'],
-                $properties['CsHost'],
-                $properties['CsMethod'],
-                $properties['CsBytes'],
-                $properties['CIp'],
-                $properties['SPort'],
-                $properties['Referer'],
-                $properties['CsUriStem'],
-                $properties['TimeTaken'],
-                $properties['ScBytes'],
-                $properties['ComputerName']
-            ]);
+            $headers = array_merge($headers, array_diff(array_keys(prepareCSVDataForEachJSONLine($line)), $headers));
+        }
+    }
+    fputcsv($fop, $headers);
+    rewind($fip);
+    // Read JSON file 2nd time to write data
+    while (!feof($fip)) {
+        $line = fgets($fip);
+        if ($line) {
+            $lineItems = prepareCSVDataForEachJSONLine($line);
+            $lineItemsValues = [];
+            foreach ($headers as $header) {
+                array_push($lineItemsValues, $lineItems[$header] ?? '-');
+            }
+            fputcsv($fop, array_values($lineItemsValues));
         }
         // Update progress
         ++$index;
