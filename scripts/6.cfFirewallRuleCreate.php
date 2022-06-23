@@ -20,7 +20,7 @@ $zoneFW = new CFBuddy\CFZoneFW();
 $skippedZones = [];
 
 $filter = new CFFWRuleFilter($config['expression'], false);
-$rule = new CFFWRule($config['description'], false, $filter, $config['action'], $config['products']);
+$rule = new CFFWRule($config['description'], false, $filter, $config['action'], $config['products'] ?? []);
 
 foreach ($zones as $index => $zone) {
     $zone = idn_to_ascii(trim($zone), IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);

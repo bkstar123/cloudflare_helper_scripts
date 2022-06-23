@@ -42,7 +42,7 @@ foreach ($zones as $index => $zone) {
         fputcsv($fh, [$zone, 'true', '', '', '', '', '', '']);
     } else {
         print "A custom certificate found. Fetching its data...\n";
-        if (!$customSSL->fetchCertData($zone, $zoneID, $currentCertID, $fh)) {
+        if (!$customSSL->fetchCertDataToFile($zone, $zoneID, $currentCertID, $fh)) {
             print "Failed to fetch the current certificate data for the zone $zone due to an error. Please manually verify it on Cloudflare\n";
             break;
         }

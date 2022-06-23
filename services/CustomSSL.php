@@ -96,7 +96,7 @@ class CustomSSL extends CFServiceBase
      * @param string $certID
      * @param resource $fh
      */
-    public function fetchCertData($zone, $zoneID, $certID, $fh)
+    public function fetchCertDataToFile($zone, $zoneID, $certID, $fh)
     {
         $zoneMgmt = new ZoneMgmt();
         $sslMode = $zoneMgmt->getZoneSSLMode($zoneID);
@@ -116,6 +116,37 @@ class CustomSSL extends CFServiceBase
                     json_encode($data['result']['hosts'])
                 ]);
                 return true;
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Fetch the current custom SSL certificate data for the given zone
+     * and return the details as an array
+     *
+     * @param string $zoneID
+     * @param string $certID
+     *
+     * @return array
+     */
+    public function fetchCertDataToArray($zoneID, $certID)
+    {
+        $url = "zones/$zoneID/custom_certificates/$certID";
+        try {
+            $res = $this->client->request('GET', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                return [
+                    'issuer' => $data['result']['issuer'],
+                    'uploaded_on' => $data['result']['uploaded_on'],
+                    'modified_on' => $data['result']['modified_on'],
+                    'expires_on' => $data['result']['expires_on'],
+                    'hosts' => json_encode($data['result']['hosts'])
+                ];
             } else {
                 return false;
             }
