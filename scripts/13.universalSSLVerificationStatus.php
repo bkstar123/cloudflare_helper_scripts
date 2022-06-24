@@ -56,13 +56,13 @@ do {
                         }
                     }
                     if ($isCoverbyCustomCert) {
-                        $comment = "Can be safely ignored as all hostnams are covered by a custom certificate";
+                        $comment = "Can be safely ignored as all hostnamess are covered by a custom certificate";
                     } else {
                         $comment = "It is likely that the custom certificate on the zone does not cover all hostnames which are pending for univeral SSL renewal";
                     }
                 }
             } else {
-                $comment = 'All hostnames of the zone have active universal certificate';
+                $comment = 'No hostnames with inactive universal certificate on the zone';
             }
             fputcsv($fh, [$zone['name'], json_encode($inactiveUniversalSSL), $comment]);
         }
