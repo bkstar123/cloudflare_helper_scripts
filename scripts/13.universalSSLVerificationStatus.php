@@ -9,7 +9,7 @@ require(__DIR__.'/../bootstrap.php');
 function toWildcardHostname($hostname)
 {
     $hostname = idn_to_ascii(trim($hostname), IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
-    return substr_replace($hostname,'*.',0, strpos($hostname, ".") + 1);
+    return substr_replace($hostname, '*.', 0, strpos($hostname, ".") + 1);
 }
 
 // Open file for writing the output in csv format, insert the field headers
@@ -50,8 +50,8 @@ do {
                     if (!empty($diffHostnames)) {
                         foreach ($diffHostnames as $hostname) {
                             if (!in_array(toWildcardHostname($hostname), $sanDomains)) {
-                               $isCoverbyCustomCert = false;
-                               break;
+                                $isCoverbyCustomCert = false;
+                                break;
                             }
                         }
                     }

@@ -133,7 +133,7 @@ class ZoneMgmt extends CFServiceBase
             if ($data["success"]) {
                 if (!empty($data['result'])) {
                     $dns_records = array_filter($data['result'], function ($record) {
-                        return $record['type'] == 'CNAME' || $record['type'] == 'A';
+                        return ($record['type'] == 'CNAME' && stristr($record['content'], 'episerver.net')) || $record['type'] == 'A';
                     });
                     $subDomains = array_map(function ($record) {
                         return $record['name'];

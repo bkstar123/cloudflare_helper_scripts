@@ -33,7 +33,7 @@ $fip = fopen(__DIR__ . '/../input/12.http_log.json', 'r');
 $fop = fopen(__DIR__ . '/../output/http_log.csv', 'w');
 
 $index = 0;
-if ($fip) {   
+if ($fip) {
     // Read JSON file first time to extract headers
     $headers = [];
     while (!feof($fip)) {

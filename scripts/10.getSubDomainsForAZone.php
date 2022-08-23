@@ -10,7 +10,7 @@ require(__DIR__.'/../bootstrap.php');
 $fh = fopen(__DIR__ . '/../output/DnsRecords.txt', 'w');
 
 $zoneMgmt = new CFBuddy\ZoneMgmt();
-$zone = 'your.zone';
+$zone = 'skanska.com';
 
 $data = $zoneMgmt->getZoneSubDomains($zoneMgmt->getZoneID($zone));
 fwrite($fh, json_encode($data));

@@ -33,22 +33,22 @@ $zoneID = $zoneMgmt->getZoneID($zone);
 
 // Update FW rule for a zone
 if ($zoneID) {
-  $rules = $zoneFW->getFWRuleForZone($zoneID, [
+    $rules = $zoneFW->getFWRuleForZone($zoneID, [
     'description' => $description
   ]);
-  if ($rules) {
-    foreach ($rules as $rule) {
-      $rule->paused = true;
-      $rule->description = 'tuho';
-      $rule->action = 'block';
-      $rule->products = [];
-      $rule->filter->expression = "(http.request.uri.path contains \".php\") or (http.request.uri.path contains \"/wp-content/\") or (http.request.uri.path contains \"/wp-includes/\") or (http.user_agent contains \"Fuzz Faster U Fool\")";
-      $zoneFW->updateFWRuleForZone($zoneID, $rule);
-      $zoneFW->updateFWRuleFilterForZone($zoneID, $rule->filter);
+    if ($rules) {
+        foreach ($rules as $rule) {
+            $rule->paused = true;
+            $rule->description = 'tuho';
+            $rule->action = 'block';
+            $rule->products = [];
+            $rule->filter->expression = "(http.request.uri.path contains \".php\") or (http.request.uri.path contains \"/wp-content/\") or (http.request.uri.path contains \"/wp-includes/\") or (http.user_agent contains \"Fuzz Faster U Fool\")";
+            $zoneFW->updateFWRuleForZone($zoneID, $rule);
+            $zoneFW->updateFWRuleFilterForZone($zoneID, $rule->filter);
+        }
+    } else {
+        print "No FW rule found for this zone";
     }
-  } else {
-    print "No FW rule found for this zone";
-  }
 } else {
-  print "No zone found";
+    print "No zone found";
 }
