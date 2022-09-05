@@ -23,7 +23,7 @@ do {
         print "Checking hostnames for zone " . $zone['name'] . "\n";
         $hostnames = array_merge($hostnames, $zoneMgmt->getZoneSubDomains($zone['id']));
     }
-    fwrite($fh, implode("\n", $hostnames));
+    fwrite($fh, implode("\n", $hostnames) . "\n");
     ++$page;
 } while (!empty($zones));
 fclose($fh);

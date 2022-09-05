@@ -21,6 +21,7 @@ class CFServiceBase
     public function __construct()
     {
         $this->client = new Client([
+            'verify' => false, // This is not recommended settings => used for temporarily fixing cURL error 60: SSL cert problem: cert has expired
             'base_uri' => $_ENV['CF_BASE_URI'],
             'headers' => [
                 'X-Auth-Email' => $_ENV['CF_API_EMAIL'],
