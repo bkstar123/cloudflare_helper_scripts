@@ -21,7 +21,7 @@ do {
     }
     foreach ($zones as $zone) {
         print "Checking hostnames for zone " . $zone['name'] . "\n";
-        $hostnames = array_merge($hostnames, $zoneMgmt->getZoneSubDomains($zone['id']));
+        $hostnames = array_merge($hostnames, $zoneMgmt->getZoneSubDomains($zone['id'], true));
     }
     fwrite($fh, implode("\n", $hostnames) . "\n");
     ++$page;

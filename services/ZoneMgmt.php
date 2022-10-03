@@ -100,12 +100,12 @@ class ZoneMgmt extends CFServiceBase
      * @param string $zoneID
      * @return array
      */
-    public function getZoneSubDomains($zoneID)
+    public function getZoneSubDomains($zoneID, $longString = false, $onlyProdDomains = true)
     {
         $zoneSubDomains = [];
         $page = 1;
         do {
-            $data = $this->getZonePaginatedSubDomains($zoneID, $page, 100);
+            $data = $this->getZonePaginatedSubDomains($zoneID, $longString, $onlyProdDomains, $page, 100);
             if (empty($data)) {
                 break;
             }
@@ -123,7 +123,7 @@ class ZoneMgmt extends CFServiceBase
      * @param integer $perPage
      * @return array|false
      */
-    protected function getZonePaginatedSubDomains($zoneID, $page = 1, $perPage = 100)
+    protected function getZonePaginatedSubDomains($zoneID, $longString, $onlyProdDomains, $page = 1, $perPage = 100)
     {
         $subDomains = [];
         $url = "zones/$zoneID/dns_records?per_page=$perPage&page=$page";
@@ -132,11 +132,19 @@ class ZoneMgmt extends CFServiceBase
             $data = json_decode($res->getBody()->getContents(), true);
             if ($data["success"]) {
                 if (!empty($data['result'])) {
-                    $dns_records = array_filter($data['result'], function ($record) {
-                        return ($record['type'] == 'CNAME' && stristr($record['content'], 'episerver.net') && stristr($record['content'], 'prod.')) || $record['type'] == 'A';
+                    $dns_records = array_filter($data['result'], function ($record) use ($onlyProdDomains) {
+                        if ($onlyProdDomains) {
+                            return ($record['type'] == 'CNAME' && stristr($record['content'], 'episerver.net') && stristr($record['content'], 'prod.')) || $record['type'] == 'A';
+                        } else {
+                            return ($record['type'] == 'CNAME' && stristr($record['content'], 'episerver.net')) || $record['type'] == 'A';
+                        }
                     });
-                    $subDomains = array_map(function ($record) {
-                        return $record['name'] . ":" . $record['type'] . ":" . $record['content'];
+                    $subDomains = array_map(function ($record) use ($longString) {
+                        if ($longString) {
+                            return $record['name'] . "," . $record['type'] . "," . $record['content'];
+                        } else {
+                            return $record['name'];
+                        }
                     }, $dns_records);
                     return $subDomains;
                 } else {
