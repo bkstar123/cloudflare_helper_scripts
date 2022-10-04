@@ -100,12 +100,12 @@ class ZoneMgmt extends CFServiceBase
      * @param string $zoneID
      * @return array
      */
-    public function getZoneSubDomains($zoneID, $longString = false, $onlyProdDomains = true)
+    public function getZoneSubDomains($zoneID, $onlyDNSName = true, $onlyProd = true, $content = null, $proxied = true)
     {
         $zoneSubDomains = [];
         $page = 1;
         do {
-            $data = $this->getZonePaginatedSubDomains($zoneID, $longString, $onlyProdDomains, $page, 100);
+            $data = $this->getDNSRecordsForAZone($zoneID, $onlyDNSName, $onlyProd, $content, $proxied , $page, 100);
             if (empty($data)) {
                 break;
             }
@@ -116,70 +116,57 @@ class ZoneMgmt extends CFServiceBase
     }
 
     /**
-     * Get the list of sub domains for the given zone by the given page
+     * Get the list of all DNS CNAME & A records for al hostnames under the given zone ID
      *
      * @param string $zoneID
-     * @param integer $page
-     * @param integer $perPage
-     * @return array|false
+     * @param bool $onlyDNSName
+     * @param bool $onlyProd
+     * @param bool $content
+     * @param bool $proxied
+     * @param int $page
+     * @param int $perPage
+     *
+     * @return array
      */
-    protected function getZonePaginatedSubDomains($zoneID, $longString, $onlyProdDomains, $page = 1, $perPage = 100)
+    public function getDNSRecordsForAZone(
+        $zoneID, 
+        $onlyDNSName = true, 
+        $onlyProd = true, 
+        $content = null, 
+        $proxied = true, 
+        $page = 1, 
+        $perPage = 100)
     {
-        $subDomains = [];
+        $entries = [];
         $url = "zones/$zoneID/dns_records?per_page=$perPage&page=$page";
+        if (!is_null($content)) {
+            $url .= "&content=$content";
+        } else if (!is_null($proxied)) {
+            $proxied = (int) $proxied;
+            $url .= "&proxied=$proxied";
+        }
         try {
             $res = $this->client->request('GET', $url);
             $data = json_decode($res->getBody()->getContents(), true);
             if ($data["success"]) {
                 if (!empty($data['result'])) {
-                    $dns_records = array_filter($data['result'], function ($record) use ($onlyProdDomains) {
-                        if ($onlyProdDomains) {
+                    $dns_records = array_filter($data['result'], function ($record) use ($onlyProd) {
+                        if ($onlyProd) {
                             return ($record['type'] == 'CNAME' && stristr($record['content'], 'episerver.net') && stristr($record['content'], 'prod.')) || $record['type'] == 'A';
                         } else {
                             return ($record['type'] == 'CNAME' && stristr($record['content'], 'episerver.net')) || $record['type'] == 'A';
                         }
                     });
-                    $subDomains = array_map(function ($record) use ($longString) {
-                        if ($longString) {
+                    $entries = array_map(function ($record) use ($onlyDNSName) {
+                        if (!$onlyDNSName) {
                             return $record['name'] . "," . $record['type'] . "," . $record['content'];
                         } else {
                             return $record['name'];
                         }
                     }, $dns_records);
-                    return $subDomains;
+                    return $entries;
                 } else {
                     return [];
-                }
-            } else {
-                return false;
-            }
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Get DNS CNAME record for a custom domain of the given zone
-     *
-     * @param $zoneID string
-     * @param $name string
-     *
-     * @return string
-     */
-    public function getCFDnsCnameForACustomDomain($zoneID, $name)
-    {
-        $url = "zones/$zoneID/dns_records?name=$name";
-        try {
-            $res = $this->client->request('GET', $url);
-            $data = json_decode($res->getBody()->getContents(), true);
-            if ($data["success"]) {
-                if (!empty($data['result'])) {
-                    $dns_records = array_filter($data['result'], function ($record) {
-                        return $record['type'] == 'CNAME';
-                    });
-                    return $dns_records[0]['content'];
-                } else {
-                    return '';
                 }
             } else {
                 return false;
