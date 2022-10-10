@@ -39,7 +39,7 @@ function resolveRedirectTargets($hostname)
 }
 $list = file_get_contents(__DIR__ . '/../input/15.domains_to_browse.txt');
 $hostnames = explode("\n", $list);
-$hostnames = array_filter($hostnames, function($hostname) {
+$hostnames = array_filter($hostnames, function ($hostname) {
     return !empty($hostname);
 });
 $fh = fopen(__DIR__ . '/../output/domain_browsing_result.csv', 'w');

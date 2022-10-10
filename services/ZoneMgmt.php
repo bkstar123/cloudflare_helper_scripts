@@ -95,17 +95,29 @@ class ZoneMgmt extends CFServiceBase
     }
 
     /**
-     * Get the list of all sub domains for the given zone
+     * Get the list of all sub domains configured under the given zone
      *
-     * @param string $zoneID
+     * @param string  $zoneID
+     * @param boolean $onlyDNSName
+     * @param boolean $onlyProd
+     * @param string  $content
+     * @param boolean $proxied
+     *
      * @return array
      */
-    public function getZoneSubDomains($zoneID, $onlyDNSName = true, $onlyProd = true, $content = null, $proxied = true)
+    public function getZoneSubDomains(
+        $zoneID,
+        $hostname = null,
+        $onlyDNSName = true,
+        $onlyProd = true,
+        $content = null,
+        $proxied = true
+    )
     {
         $zoneSubDomains = [];
         $page = 1;
         do {
-            $data = $this->getDNSRecordsForAZone($zoneID, $onlyDNSName, $onlyProd, $content, $proxied , $page, 100);
+            $data = $this->getDNSRecordsForAZone($zoneID, $hostname, $onlyDNSName, $onlyProd, $content, $proxied, $page, 100);
             if (empty($data)) {
                 break;
             }
@@ -129,21 +141,27 @@ class ZoneMgmt extends CFServiceBase
      * @return array
      */
     public function getDNSRecordsForAZone(
-        $zoneID, 
-        $onlyDNSName = true, 
-        $onlyProd = true, 
-        $content = null, 
-        $proxied = true, 
-        $page = 1, 
-        $perPage = 100)
+        $zoneID,
+        $hostname = null,
+        $onlyDNSName = true,
+        $onlyProd = true,
+        $content = null,
+        $proxied = true,
+        $page = 1,
+        $perPage = 100
+    )
     {
         $entries = [];
         $url = "zones/$zoneID/dns_records?per_page=$perPage&page=$page";
         if (!is_null($content)) {
             $url .= "&content=$content";
-        } else if (!is_null($proxied)) {
+        }
+        if (!is_null($proxied)) {
             $proxied = (int) $proxied;
             $url .= "&proxied=$proxied";
+        }
+        if (!is_null($hostname)) {
+            $url .= "&name=$hostname";
         }
         try {
             $res = $this->client->request('GET', $url);

@@ -12,7 +12,6 @@ $fh = fopen(__DIR__ . '/../output/cfProxiedHostnames4.txt', 'a');
 $zoneMgmt = new CFBuddy\ZoneMgmt();
 $page = 1;
 do {
-    $hostnames = [];
     print "Fetch page - " . $page . "\n";
     $zones = $zoneMgmt->getZones($page, 100);
     if (empty($zones)) {
@@ -21,9 +20,12 @@ do {
     }
     foreach ($zones as $zone) {
         print "Checking hostnames for zone " . $zone['name'] . "\n";
-        $hostnames = array_merge($hostnames, $zoneMgmt->getZoneSubDomains($zone['id'], true));
+        $entries = $zoneMgmt->getZoneSubDomains($zone['id'], null, true);
+        if (!empty($entries)) {
+            fwrite($fh, implode("\n", $entries));
+            fwrite($fh, "\n");
+        }
     }
-    fwrite($fh, implode("\n", $hostnames) . "\n");
     ++$page;
 } while (!empty($zones));
 fclose($fh);
