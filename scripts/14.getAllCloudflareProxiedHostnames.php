@@ -20,7 +20,7 @@ do {
     }
     foreach ($zones as $zone) {
         print "Checking hostnames for zone " . $zone['name'] . "\n";
-        $entries = $zoneMgmt->getZoneSubDomains($zone['id'], null, true);
+        $entries = $zoneMgmt->getZoneSubDomains($zone['id'], null, false, true);
         if (!empty($entries)) {
             fwrite($fh, implode("\n", $entries));
             fwrite($fh, "\n");
