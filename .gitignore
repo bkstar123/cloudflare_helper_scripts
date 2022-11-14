@@ -2,4 +2,5 @@
 .env
 /.project
 /.php_cs.cache
-/scripts/test.php
+/scripts/test1.php
+/scripts/test2.php
