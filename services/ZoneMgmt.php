@@ -75,17 +75,7 @@ class ZoneMgmt extends CFServiceBase
             $res = $this->client->request('GET', $url);
             $data = json_decode($res->getBody()->getContents(), true);
             if ($data["success"]) {
-                if (!empty($data['result'])) {
-                    $zones = array_map(function ($zone) {
-                        return [
-                            'id' => $zone['id'],
-                            'name' => $zone['name']
-                        ];
-                    }, $data['result']);
-                    return $zones;
-                } else {
-                    return [];
-                }
+                return $data['result'];
             } else {
                 return false;
             }
@@ -209,6 +199,29 @@ class ZoneMgmt extends CFServiceBase
             $data = json_decode($res->getBody()->getContents(), true);
             if ($data["success"]) {
                 return $data['result'];
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Verify whether or not China Network is enabled for the given zone
+     *
+     * @param $zoneID string
+     *
+     * @return null|bool
+     */
+    public function verifyChinaNetworkEnabling($zoneID)
+    {
+        $url = "zones/$zoneID";
+        try {
+            $res = $this->client->request('GET', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                return isset($data['result']['betas']) && in_array('jdcloud_network_operational', $data['result']['betas']);
             } else {
                 return false;
             }
