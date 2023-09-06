@@ -184,7 +184,7 @@ class ZoneMgmt extends CFServiceBase
         }
     }
 
-    /**
+    /**8
      * Get universal SSL verification statuses for hostnames of the given zone
      *
      * @param $zoneID string
@@ -222,6 +222,29 @@ class ZoneMgmt extends CFServiceBase
             $data = json_decode($res->getBody()->getContents(), true);
             if ($data["success"]) {
                 return isset($data['result']['betas']) && in_array('jdcloud_network_operational', $data['result']['betas']);
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Get universal SSL setting status for a zone
+     *
+     * @param $zoneID string
+     *
+     * @return false|null|array
+     */
+    public function getUniversalSSLSettingStatus($zoneID)
+    {
+        $url = "zones/$zoneID/ssl/universal/settings";
+        try {
+            $res = $this->client->request('GET', $url);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if ($data["success"]) {
+                return $data['result'];
             } else {
                 return false;
             }

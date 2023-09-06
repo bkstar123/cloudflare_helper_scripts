@@ -18,7 +18,7 @@ do {
     }
     $data = array_filter($zones, function ($zone) {
         return isset($zone['betas']) && in_array('jdcloud_network_operational', $zone['betas']);
-     });
+    });
     if (!empty($data)) {
         $data = array_merge([], array_map(function ($zone) {
             return $zone['name'];

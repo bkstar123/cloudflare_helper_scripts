@@ -18,7 +18,7 @@ do {
     }
     $data = array_filter($zones, function ($zone) {
         return isset($zone['type']) && $zone['type'] != 'partial';
-     });
+    });
     if (!empty($data)) {
         $data = array_merge([], array_map(function ($zone) {
             return $zone['name'];
