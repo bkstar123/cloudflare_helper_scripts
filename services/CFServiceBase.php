@@ -26,6 +26,7 @@ class CFServiceBase
             'headers' => [
                 'X-Auth-Email' => $_ENV['CF_API_EMAIL'],
                 'X-Auth-Key'   => $_ENV['CF_API_KEY'],
+                'Authorization' => 'Bearer ' . $_ENV['CF_API_TOKEN'],
                 'Content-Type' => 'application/json'
             ]
         ]);

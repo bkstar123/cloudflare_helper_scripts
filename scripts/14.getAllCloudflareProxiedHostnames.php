@@ -8,12 +8,13 @@
 require(__DIR__.'/../bootstrap.php');
 
 // Open file for writing the output in csv format, insert the field headers
-$fh = fopen(__DIR__ . '/../output/cfProxiedHostnames4.txt', 'a');
+$fh = fopen(__DIR__ . '/../output/cfProxiedHostnames.txt', 'a');
 $zoneMgmt = new CFBuddy\ZoneMgmt();
+$accountID = '704f203b6ac1e0ffb5c6d8b6fc20ba71'; // DXP account
 $page = 1;
 do {
     print "Fetch page - " . $page . "\n";
-    $zones = $zoneMgmt->getZones($page, 100);
+    $zones = $zoneMgmt->getZones($page, 100, '', $accountID);
     if (empty($zones)) {
         print "No more zone to proceed \n";
         break;
